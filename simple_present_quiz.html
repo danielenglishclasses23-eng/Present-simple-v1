@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Present Tense Quiz</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #e0f2fe 0%, #f0fdf4 50%, #faf5ff 100%);
+        }
+        .card-shadow {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen font-sans text-slate-800 flex flex-col justify-between p-4 sm:p-6 md:p-8">
+
+    <!-- Header Banner -->
+    <header class="max-w-2xl mx-auto w-full text-center my-4">
+        <div class="inline-flex items-center gap-2 bg-white/80 backdrop-blur px-4 py-2 rounded-full border border-slate-200 text-sm font-semibold text-indigo-600 mb-2 shadow-sm">
+            <i class="fa-solid fa-graduation-cap"></i> English Grammar Assessment
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">Simple Present Quiz</h1>
+    </header>
+
+    <!-- Main Container Card -->
+    <main class="max-w-2xl mx-auto w-full bg-white rounded-2xl border border-slate-100 card-shadow overflow-hidden my-auto p-6 sm:p-8 relative">
+
+        <!-- Progress Bar (Hidden on welcome & results) -->
+        <div id="progressContainer" class="hidden mb-6">
+            <div class="flex justify-between items-center mb-2">
+                <span id="questionStepText" class="text-xs font-bold uppercase tracking-wider text-indigo-600">Question 1 of 6</span>
+                <span id="progressPercent" class="text-xs font-semibold text-slate-400">16%</span>
+            </div>
+            <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                <div id="progressBar" class="bg-indigo-600 h-full rounded-full transition-all duration-300 ease-out" style="width: 16.66%;"></div>
+            </div>
+        </div>
+
+        <!-- SCREEN 0: WELCOME SCREEN -->
+        <section id="screenWelcome" class="space-y-6">
+            <div class="text-center space-y-3">
+                <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto text-2xl font-bold">
+                    <i class="fa-solid fa-book-open"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-slate-800">Welcome to the Quiz!</h2>
+                <p class="text-slate-600 text-sm leading-relaxed max-w-md mx-auto">
+                    This quick evaluation tests your knowledge of <strong>Simple Present Tense</strong>: auxiliary verbs (<em>do/does</em>), sentence structures, and common mistakes.
+                </p>
+            </div>
+
+            <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-4 text-xs text-slate-600 space-y-2">
+                <div class="font-semibold text-slate-700 flex items-center gap-1.5">
+                    <i class="fa-solid fa-circle-info text-indigo-500"></i> Rules & Guidelines:
+                </div>
+                <ul class="list-disc list-inside space-y-1 pl-1">
+                    <li>Total questions: <strong>6</strong> (5 multiple choice + 1 written answer).</li>
+                    <li>You must answer the current question before moving to the next.</li>
+                    <li>Review your final summary and copy answers at the end.</li>
+                </ul>
+            </div>
+
+            <div class="space-y-2 pt-2">
+                <label for="userName" class="block text-sm font-semibold text-slate-700">Enter your Full Name <span class="text-red-500">*</span></label>
+                <input type="text" id="userName" placeholder="e.g. Maria Gomez" 
+                    class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition text-slate-800 font-medium placeholder-slate-400">
+                <p id="nameError" class="text-xs text-red-500 hidden font-medium flex items-center gap-1">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Please enter your name to start the quiz.
+                </p>
+            </div>
+
+            <button id="btnStart" onclick="startQuiz()" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-indigo-100 transition duration-200 flex items-center justify-center gap-2">
+                Start Assessment <i class="fa-solid fa-arrow-right text-sm"></i>
+            </button>
+        </section>
+
+        <!-- DYNAMIC QUESTION CONTAINER -->
+        <section id="screenQuestion" class="hidden space-y-6">
+            <div id="questionContent">
+                <!-- Injected via JavaScript -->
+            </div>
+
+            <!-- Validation Error Alert -->
+            <div id="validationAlert" class="hidden bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2">
+                <i class="fa-solid fa-circle-exclamation text-amber-600"></i>
+                <span id="validationAlertMsg">Please select or type an answer before proceeding.</span>
+            </div>
+
+            <!-- Question Navigation Footer -->
+            <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+                <button id="btnPrev" onclick="prevQuestion()" class="px-5 py-2.5 border border-slate-200 rounded-xl text-slate-600 font-semibold text-sm hover:bg-slate-50 transition flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
+                    <i class="fa-solid fa-arrow-left text-xs"></i> Previous
+                </button>
+                <button id="btnNext" onclick="nextQuestion()" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-xl transition shadow-md shadow-indigo-100 flex items-center gap-2">
+                    <span id="btnNextText">Next Question</span> <i class="fa-solid fa-arrow-right text-xs" id="btnNextIcon"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- SCREEN: RESULTS -->
+        <section id="screenResults" class="hidden space-y-6 text-center">
+            <div class="space-y-2">
+                <div id="scoreBadge" class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-3xl font-extrabold shadow-inner">
+                    <span id="scoreText">0/6</span>
+                </div>
+                <h2 class="text-2xl font-extrabold text-slate-800">Quiz Completed!</h2>
+                <p class="text-slate-500 text-sm">Great job, <span id="displayUserName" class="font-bold text-slate-700"></span>!</p>
+            </div>
+
+            <!-- Copy to Clipboard Box & Action -->
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-left space-y-3">
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Summary & Letter Answers</span>
+                    <button id="btnCopy" onclick="copyResultsToClipboard()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-lg transition flex items-center gap-1.5">
+                        <i class="fa-regular fa-copy"></i> <span id="copyBtnText">Copy Answers</span>
+                    </button>
+                </div>
+                <textarea id="summaryTextarea" readonly class="w-full h-32 p-3 bg-white border border-slate-200 rounded-lg text-xs font-mono text-slate-700 focus:outline-none resize-none"></textarea>
+            </div>
+
+            <!-- Detailed Breakdown -->
+            <div class="text-left space-y-3">
+                <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider">Detailed Answers Breakdown</h3>
+                <div id="breakdownList" class="space-y-3 max-h-60 overflow-y-auto pr-1">
+                    <!-- Injected via JavaScript -->
+                </div>
+            </div>
+
+            <div class="pt-2">
+                <button onclick="restartQuiz()" class="w-full py-3 border border-slate-300 text-slate-700 font-bold rounded-xl hover:bg-slate-50 transition flex items-center justify-center gap-2 text-sm">
+                    <i class="fa-solid fa-rotate-right"></i> Take Quiz Again
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center text-slate-400 text-xs my-4">
+        Simple Present Tense Interactive Test &bull; English Assessment Tool
+    </footer>
+
+    <!-- Toast Notification for Copying -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-2xl transition duration-300 opacity-0 pointer-events-none transform translate-y-2 flex items-center gap-2">
+        <i class="fa-solid fa-circle-check text-emerald-400"></i>
+        <span id="toastMsg">Summary copied to clipboard!</span>
+    </div>
+
+    <script>
+        // Quiz Data Definition
+        const quizData = [
+            {
+                id: 1,
+                type: 'mcq',
+                question: "Which auxiliary verb is used with subjects 'He', 'She', and 'It' in Simple Present questions and negatives?",
+                options: [
+                    { key: "A", text: "Do" },
+                    { key: "B", text: "Does" },
+                    { key: "C", text: "Is" },
+                    { key: "D", text: "Are" }
+                ],
+                correctKey: "B",
+                explanation: "'Does' is the auxiliary verb used for third-person singular (He/She/It)."
+            },
+            {
+                id: 2,
+                type: 'mcq',
+                question: "Which sentence is INCORRECT?",
+                options: [
+                    { key: "A", text: "She plays the piano very well." },
+                    { key: "B", text: "They doesn't like spicy food." },
+                    { key: "C", text: "Do you live in Madrid?" },
+                    { key: "D", text: "He goes to work by bus." }
+                ],
+                correctKey: "B",
+                explanation: "'They' requires the auxiliary 'don't' (do not), not 'doesn't'."
+            },
+            {
+                id: 3,
+                type: 'mcq',
+                question: "Complete the sentence: 'My brother _____ work at 8:00 AM every morning.'",
+                options: [
+                    { key: "A", text: "start" },
+                    { key: "B", text: "starts" },
+                    { key: "C", text: "starting" },
+                    { key: "D", text: "is start" }
+                ],
+                correctKey: "B",
+                explanation: "Third-person singular 'My brother' (he) takes '-s' at the end of the verb in positive sentences."
+            },
+            {
+                id: 4,
+                type: 'mcq',
+                question: "Which of the following sentences is grammatically INCORRECT?",
+                options: [
+                    { key: "A", text: "Where do you work?" },
+                    { key: "B", text: "He don't watch TV in the evening." },
+                    { key: "C", text: "Does Sarah have a cat?" },
+                    { key: "D", text: "We study English on Mondays." }
+                ],
+                correctKey: "B",
+                explanation: "'He don't' is incorrect. It should be 'He doesn't watch TV'."
+            },
+            {
+                id: 5,
+                type: 'mcq',
+                question: "What is the correct negative structure for 'I speak French'?",
+                options: [
+                    { key: "A", text: "I not speak French." },
+                    { key: "B", text: "I doesn't speak French." },
+                    { key: "C", text: "I don't speak French." },
+                    { key: "D", text: "I am not speak French." }
+                ],
+                correctKey: "C",
+                explanation: "Subject 'I' requires 'don't' + base form of the verb."
+            },
+            {
+                id: 6,
+                type: 'text',
+                question: "Written Task: Rewrite the following sentence into the NEGATIVE form: 'She likes chocolate.'",
+                placeholder: "Type your answer here...",
+                correctAnswers: ["she doesn't like chocolate.", "she does not like chocolate.", "she doesn't like chocolate", "she does not like chocolate"],
+                explanation: "Negative form: 'She doesn't like chocolate' or 'She does not like chocolate'."
+            }
+        ];
+
+        // State variables
+        let currentStep = 0; // 0 = welcome, 1 to 6 = questions, 7 = results
+        let userAnswers = {}; // { 1: "B", 2: "A", ..., 6: "text answer" }
+        let studentName = "";
+
+        // UI Element References
+        const screenWelcome = document.getElementById('screenWelcome');
+        const screenQuestion = document.getElementById('screenQuestion');
+        const screenResults = document.getElementById('screenResults');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const questionStepText = document.getElementById('questionStepText');
+        const progressPercent = document.getElementById('progressPercent');
+        const questionContent = document.getElementById('questionContent');
+        const validationAlert = document.getElementById('validationAlert');
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+        const btnNextText = document.getElementById('btnNextText');
+
+        // Start Quiz Handler
+        function startQuiz() {
+            const nameInput = document.getElementById('userName');
+            const nameError = document.getElementById('nameError');
+            
+            studentName = nameInput.value.trim();
+
+            if (!studentName) {
+                nameError.classList.remove('hidden');
+                nameInput.classList.add('border-red-500', 'bg-red-50');
+                nameInput.focus();
+                return;
+            }
+
+            nameError.classList.add('hidden');
+            nameInput.classList.remove('border-red-500', 'bg-red-50');
+
+            currentStep = 1;
+            screenWelcome.classList.add('hidden');
+            progressContainer.classList.remove('hidden');
+            screenQuestion.classList.remove('hidden');
+
+            renderQuestion();
+        }
+
+        // Render current question page
+        function renderQuestion() {
+            validationAlert.classList.add('hidden');
+            const questionIndex = currentStep - 1;
+            const qData = quizData[questionIndex];
+
+            // Update Progress Bar
+            const total = quizData.length;
+            const percentage = Math.round((currentStep / total) * 100);
+            progressBar.style.width = `${percentage}%`;
+            questionStepText.innerText = `Question ${currentStep} of ${total}`;
+            progressPercent.innerText = `${percentage}%`;
+
+            // Navigation Button States
+            btnPrev.disabled = (currentStep === 1);
+            if (currentStep === total) {
+                btnNextText.innerText = "Finish Quiz";
+            } else {
+                btnNextText.innerText = "Next Question";
+            }
+
+            // Build Question HTML
+            let html = `
+                <div class="space-y-4">
+                    <span class="inline-block px-3 py-1 bg-indigo-50 text-indigo-700 text-xs font-bold rounded-md">
+                        ${qData.type === 'mcq' ? 'Multiple Choice' : 'Written Response'}
+                    </span>
+                    <h3 class="text-lg sm:text-xl font-bold text-slate-900 leading-snug">
+                        ${qData.question}
+                    </h3>
+            `;
+
+            if (qData.type === 'mcq') {
+                html += `<div class="space-y-2.5 mt-4">`;
+                qData.options.forEach(opt => {
+                    const isSelected = userAnswers[qData.id] === opt.key;
+                    const borderClass = isSelected ? 'border-indigo-600 bg-indigo-50/60 ring-2 ring-indigo-500/20' : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50';
+                    const badgeClass = isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600';
+
+                    html += `
+                        <label onclick="selectMCQAnswer(${qData.id}, '${opt.key}')" 
+                               class="flex items-center gap-3 p-3.5 border rounded-xl cursor-pointer transition ${borderClass}">
+                            <span class="w-8 h-8 flex items-center justify-center font-bold text-xs rounded-lg ${badgeClass} shrink-0">
+                                ${opt.key}
+                            </span>
+                            <span class="text-sm font-medium text-slate-800">${opt.text}</span>
+                        </label>
+                    `;
+                });
+                html += `</div>`;
+            } else if (qData.type === 'text') {
+                const existingVal = userAnswers[qData.id] || '';
+                html += `
+                    <div class="mt-4 space-y-2">
+                        <textarea id="writtenInput" oninput="handleTextInput(${qData.id}, this.value)"
+                                  placeholder="${qData.placeholder}" 
+                                  class="w-full p-4 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-medium text-slate-800 h-28 resize-none">${existingVal}</textarea>
+                        <p class="text-xs text-slate-400">Tip: Check your spelling and punctuation before continuing.</p>
+                    </div>
+                `;
+            }
+
+            html += `</div>`;
+            questionContent.innerHTML = html;
+        }
+
+        // Handle selection for MCQ
+        function selectMCQAnswer(questionId, optionKey) {
+            userAnswers[questionId] = optionKey;
+            validationAlert.classList.add('hidden');
+            renderQuestion(); // Re-render to update UI classes
+        }
+
+        // Handle text typing
+        function handleTextInput(questionId, value) {
+            userAnswers[questionId] = value;
+            if (value.trim() !== '') {
+                validationAlert.classList.add('hidden');
+            }
+        }
+
+        // Validate if current question has an answer
+        function isCurrentQuestionAnswered() {
+            const qData = quizData[currentStep - 1];
+            const answer = userAnswers[qData.id];
+
+            if (qData.type === 'mcq') {
+                return answer !== undefined && answer !== "";
+            } else if (qData.type === 'text') {
+                return answer !== undefined && answer.trim().length > 0;
+            }
+            return false;
+        }
+
+        // Next Question Button Click Handler
+        function nextQuestion() {
+            if (!isCurrentQuestionAnswered()) {
+                validationAlert.classList.remove('hidden');
+                return;
+            }
+
+            validationAlert.classList.add('hidden');
+
+            if (currentStep < quizData.length) {
+                currentStep++;
+                renderQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        // Previous Question Button Click Handler
+        function prevQuestion() {
+            if (currentStep > 1) {
+                currentStep--;
+                renderQuestion();
+            }
+        }
+
+        // Calculate and Show Results Screen
+        function finishQuiz() {
+            screenQuestion.classList.add('hidden');
+            progressContainer.classList.add('hidden');
+            screenResults.classList.remove('hidden');
+
+            document.getElementById('displayUserName').innerText = studentName;
+
+            let score = 0;
+            let summaryTextLines = [];
+            summaryTextLines.push(`STUDENT: ${studentName}`);
+            summaryTextLines.push(`QUIZ: Simple Present Tense Evaluation`);
+            summaryTextLines.push(`DATE: ${new Date().toLocaleDateString()}`);
+            summaryTextLines.push(`----------------------------------------`);
+            summaryTextLines.push(`ANSWER SUMMARY (Letter/Written Format):`);
+
+            let breakdownHTML = "";
+
+            quizData.forEach((q, index) => {
+                const userAns = userAnswers[q.id] || "No Answer";
+                let isCorrect = false;
+
+                if (q.type === 'mcq') {
+                    isCorrect = (userAns === q.correctKey);
+                    summaryTextLines.push(`Q${index + 1}: [ ${userAns} ]`);
+                } else if (q.type === 'text') {
+                    const normalizedUser = userAns.trim().toLowerCase();
+                    isCorrect = q.correctAnswers.some(c => c.toLowerCase() === normalizedUser);
+                    summaryTextLines.push(`Q${index + 1}: "${userAns}"`);
+                }
+
+                if (isCorrect) score++;
+
+                // Build Detailed breakdown HTML
+                breakdownHTML += `
+                    <div class="p-3.5 border ${isCorrect ? 'border-emerald-200 bg-emerald-50/50' : 'border-rose-200 bg-rose-50/50'} rounded-xl text-xs space-y-1">
+                        <div class="flex justify-between items-start font-bold">
+                            <span class="text-slate-800">Q${index + 1}: ${q.question}</span>
+                            <span class="${isCorrect ? 'text-emerald-700' : 'text-rose-700'} uppercase font-extrabold text-[10px] px-2 py-0.5 rounded ${isCorrect ? 'bg-emerald-100' : 'bg-rose-100'}">
+                                ${isCorrect ? 'Correct' : 'Incorrect'}
+                            </span>
+                        </div>
+                        <p class="text-slate-600">Your answer: <strong class="${isCorrect ? 'text-emerald-800' : 'text-rose-800'}">${userAns}</strong></p>
+                        ${!isCorrect ? `<p class="text-slate-500">Explanation: ${q.explanation}</p>` : ''}
+                    </div>
+                `;
+            });
+
+            summaryTextLines.push(`----------------------------------------`);
+            summaryTextLines.push(`FINAL SCORE: ${score} / ${quizData.length} (${Math.round((score / quizData.length) * 100)}%)`);
+
+            // Populate textarea & text summary
+            document.getElementById('scoreText').innerText = `${score}/${quizData.length}`;
+            document.getElementById('summaryTextarea').value = summaryTextLines.join('\n');
+            document.getElementById('breakdownList').innerHTML = breakdownHTML;
+        }
+
+        // Copy Text Summary to Clipboard
+        function copyResultsToClipboard() {
+            const textarea = document.getElementById('summaryTextarea');
+            textarea.select();
+            textarea.setSelectionRange(0, 99999); // Mobile support
+
+            try {
+                document.execCommand('copy');
+                showToast("Answers summary copied to clipboard!");
+            } catch (err) {
+                showToast("Failed to copy automatically. Please copy manually.");
+            }
+        }
+
+        // Toast message utility
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            toastMsg.innerText = message;
+
+            toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-2');
+            toast.classList.add('opacity-100', 'translate-y-0');
+
+            setTimeout(() => {
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-2');
+            }, 3000);
+        }
+
+        // Restart Quiz
+        function restartQuiz() {
+            currentStep = 0;
+            userAnswers = {};
+            document.getElementById('userName').value = studentName; // keep name
+            screenResults.classList.add('hidden');
+            screenWelcome.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
